@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b130e"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="ANIMA"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><title>ANIMA — Ruota dell’Anno</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Nunito+Sans:wght@400;600&display=swap">
+<style>
+:root{--bg:#eceee3;--card:#f6f6ee;--tx:#1b2a21;--mu:#55645a;--gold:#7d5f17;--sage:#5d7a63;--line:#c9cfbd;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b130e;--card:#14201a;--tx:#e9e5d3;--mu:#9aab9f;--gold:#c9a85c;--sage:#8fa88f;--line:#26362d}}
+:root[data-theme="dark"]{--bg:#0b130e;--card:#14201a;--tx:#e9e5d3;--mu:#9aab9f;--gold:#c9a85c;--sage:#8fa88f;--line:#26362d}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 "Nunito Sans",system-ui,sans-serif;padding-bottom:84px}
+h1,h2,h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;margin:0 0 .4em;line-height:1.15}
+h1{font-size:2.1rem;letter-spacing:.04em}h2{font-size:1.55rem}h3{font-size:1.2rem;color:var(--gold)}
+main{max-width:560px;margin:0 auto;padding:18px 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px}
+.mu{color:var(--mu);font-size:.9rem}.q{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-size:1.15rem}
+.src{font-size:.78rem;color:var(--mu);border-top:1px dashed var(--line);margin-top:10px;padding-top:6px}
+.sym{border-left:3px solid var(--gold);padding-left:10px;margin:10px 0}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));z-index:5}
+nav button{flex:1;background:none;border:0;color:var(--mu);font:600 .78rem "Nunito Sans",sans-serif;padding:8px 2px;min-height:44px}
+nav button[aria-current=true]{color:var(--gold)}
+button.b{background:var(--gold);color:var(--bg);border:0;border-radius:10px;padding:10px 16px;font:600 1rem "Nunito Sans",sans-serif;min-height:44px}
+button.g{background:none;border:1px solid var(--line);color:var(--tx);border-radius:10px;padding:8px 12px;min-height:40px}
+input,textarea{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;margin:4px 0 10px}
+label{font-size:.85rem;color:var(--mu)}
+table{width:100%;border-collapse:collapse}td{padding:6px 2px;border-bottom:1px solid var(--line)}td:last-child{text-align:right}
+.row{display:flex;gap:12px;align-items:center}ol{padding-left:20px}li{margin:4px 0}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+@media(prefers-reduced-motion:no-preference){.fade{animation:f .8s ease both}@keyframes f{from{opacity:0}to{opacity:1}}}
+</style></head><body><main id="app"></main>
+<nav id="nav"></nav>
+<script>
+const R=Math.PI/180,n360=x=>((x%360)+360)%360,$=s=>document.querySelector(s);
+const Z=["Ariete","Toro","Gemelli","Cancro","Leone","Vergine","Bilancia","Scorpione","Sagittario","Capricorno","Acquario","Pesci"];
+const ZE=["fuoco","terra","aria","acqua"];
+const EL={fuoco:"slancio e iniziativa",terra:"concretezza e cura delle cose pratiche",aria:"pensiero, parola e confronto",acqua:"emozioni e intuizione"};
+const jdOf=t=>t/864e5+2440587.5,dOf=t=>jdOf(t)-2451543.5;
+function kep(M,e){M=n360(M)*R;let E=M+e*Math.sin(M)*(1+e*Math.cos(M));for(let i=0;i<8;i++)E-=(E-e*Math.sin(E)-M)/(1-e*Math.cos(E));return E}
+function orb(el,d){const N=(el[0]+el[1]*d)*R,i=(el[2]+el[3]*d)*R,w=el[4]+el[5]*d,a=el[6]+el[7]*d,e=el[8]+el[9]*d,M=el[10]+el[11]*d,E=kep(M,e),xv=a*(Math.cos(E)-e),yv=a*Math.sqrt(1-e*e)*Math.sin(E),v=Math.atan2(yv,xv)/R,r=Math.hypot(xv,yv),u=(v+w)*R;
+return[r*(Math.cos(N)*Math.cos(u)-Math.sin(N)*Math.sin(u)*Math.cos(i)),r*(Math.sin(N)*Math.cos(u)+Math.cos(N)*Math.sin(u)*Math.cos(i)),r*Math.sin(u)*Math.sin(i),r]}
+const SUN=[0,0,0,0,282.9404,4.70935e-5,1,0,.016709,-1.151e-9,356.047,.9856002585];
+const MOON=[125.1228,-.0529538083,5.1454,0,318.0634,.1643573223,60.2666,0,.0549,0,115.3654,13.0649929509];
+const PL={Mercurio:[48.3313,3.24587e-5,7.0047,5e-8,29.1241,1.01444e-5,.387098,0,.205635,5.59e-10,168.6562,4.0923344368],
+Venere:[76.6799,2.4659e-5,3.3946,2.75e-8,54.891,1.38374e-5,.72333,0,.006773,-1.302e-9,48.0052,1.6021302244],
+Marte:[49.5574,2.11081e-5,1.8497,-1.78e-8,286.5016,2.92961e-5,1.523688,0,.093405,2.516e-9,18.6021,.5240207766],
+Giove:[100.4542,2.76854e-5,1.303,-1.557e-7,273.8777,1.64505e-5,5.20256,0,.048498,4.469e-9,19.895,.0830853001],
+Saturno:[113.6634,2.3898e-5,2.4886,-1.081e-7,339.3939,2.97661e-5,9.55475,0,.055546,-9.499e-9,316.967,.0334442282],
+Urano:[74.0005,1.3978e-5,.7733,1.9e-8,96.6612,3.0565e-5,19.18171,-1.55e-8,.047318,7.45e-9,142.5905,.011725806],
+Nettuno:[131.7806,3.0173e-5,1.77,-2.55e-7,272.8461,-6.027e-6,30.05826,3.313e-8,.008606,2.15e-9,260.2471,.005995147],
+Plutone:[110.3,0,17.14,0,113.76,0,39.48,0,.2488,0,14.53,.003975]};
+const GL={Sole:"☉",Luna:"☽",Mercurio:"☿",Venere:"♀",Marte:"♂",Giove:"♃",Saturno:"♄",Urano:"♅",Nettuno:"♆",Plutone:"♇"};
+const KW={Sole:"identità e vitalità",Luna:"emozioni e bisogni",Mercurio:"pensiero e comunicazione",Venere:"relazioni e valori",Marte:"energia e azione",Giove:"fiducia e crescita",Saturno:"struttura e responsabilità",Urano:"cambiamento e libertà",Nettuno:"intuizione e immaginazione",Plutone:"trasformazione profonda"};
+function lons(t){const d=dOf(t),s=orb(SUN,d),sl=n360(Math.atan2(s[1],s[0])/R),o={Sole:sl};
+const m=orb(MOON,d),Mm=115.3654+13.0649929509*d,Ms=356.047+.9856002585*d,Dm=n360(m.length&&(Math.atan2(m[1],m[0])/R)-sl),F=(125.1228-.0529538083*d)*0+(318.0634+.1643573223*d)+(125.1228-.0529538083*d)*0+(115.3654+13.0649929509*d);
+const sn=x=>Math.sin(x*R);
+let ml=Math.atan2(m[1],m[0])/R;ml+=-1.274*sn(Mm-2*Dm)+.658*sn(2*Dm)-.186*sn(Ms)-.059*sn(2*Mm-2*Dm)-.057*sn(Mm-2*Dm+Ms)+.053*sn(Mm+2*Dm)+.046*sn(2*Dm-Ms)+.041*sn(Mm-Ms)-.035*sn(Dm)-.031*sn(Mm+Ms);
+o.Luna=n360(ml);o._dist=m[3]*6371;
+for(const k in PL){const p=orb(PL[k],d);o[k]=n360(Math.atan2(p[1]+s[1],p[0]+s[0])/R+3.82394e-5*d)}return o}
+const elong=t=>{const l=lons(t);return n360(l.Luna-l.Sole)};
+function sky(t){const l=lons(t),a=lons(t-432e5),b=lons(t+432e5),r={};for(const k in PL)r[k]=n360(b[k]-a[k]+180)-180<0;
+const e=n360(l.Luna-l.Sole);l._r=r;l._e=e;l._ill=(1-Math.cos(e*R))/2;l._age=e/360*29.530588;return l}
+function cross(f,t0,step,max){let a=t0,fa=f(a);for(let x=step;x<=max;x+=step){const b=t0+x,fb=f(b);if(fa<0&&fb>=0){let lo=a,hi=b;for(let i=0;i<30;i++){const m=(lo+hi)/2;f(m)<0?lo=m:hi=m}return hi}a=b;fa=fb}return null}
+const wrap=x=>n360(x+180)-180;
+function nextPhases(t){return[["Luna nuova",0],["Primo quarto",90],["Luna piena",180],["Ultimo quarto",270]].map(([n,g])=>({n,t:cross(x=>wrap(elong(x)-g),t,216e5,36*864e5)})).sort((a,b)=>a.t-b.t)}
+function season(y,g,m,d0){return cross(x=>wrap(lons(x).Sole-g),Date.UTC(y,m,d0),216e5,16*864e5)}
+const PH=["Luna nuova","Luna crescente","Primo quarto","Gibbosa crescente","Luna piena","Gibbosa calante","Ultimo quarto","Luna calante"];
+const phIdx=e=>Math.floor((e+22.5)/45)%8;
+const LP=[
+{k:"intenzione, silenzio, nuovi inizi",f:"definire un obiettivo semplice",r:"aspettative rigide",p:"Scrivi una sola intenzione su un foglio e tienila vicino per la notte.",q:"Cosa desidero far nascere in questo ciclo?"},
+{k:"costruzione e fiducia",f:"piccoli passi concreti",r:"dubbi che bloccano",p:"Fai oggi un gesto concreto verso la tua intenzione.",q:"Quale passo posso fare oggi?"},
+{k:"impegno e scelta",f:"decisioni e azioni coraggiose",r:"procrastinazione",p:"Affronta un ostacolo: elencalo e scegli come superarlo.",q:"Cosa mi chiede una decisione?"},
+{k:"affinamento e pazienza",f:"rifinire, correggere, perseverare",r:"perfezionismo",p:"Rivedi ciò che stai costruendo e annota un ritocco.",q:"Cosa posso migliorare con pazienza?"},
+{k:"gratitudine e consapevolezza",f:"celebrare i risultati",r:"ciò che ti appesantisce",p:"Esci a guardare il cielo e nomina tre cose per cui sei grato.",q:"Cosa è maturato in questo ciclo?"},
+{k:"condivisione e bilancio",f:"trasmettere ciò che hai imparato",r:"rancori",p:"Condividi con qualcuno ciò che hai imparato di recente.",q:"Cosa posso offrire agli altri?"},
+{k:"revisione e rilascio",f:"fare ordine",r:"abitudini che non servono più",p:"Scrivi ciò che vuoi lasciare andare e riponi il foglio.",q:"Cosa non voglio più portare con me?"},
+{k:"riposo e semplificazione",f:"riposare, ridurre gli impegni",r:"obblighi superflui",p:"Dedica dieci minuti a un silenzio senza schermi.",q:"Di cosa ho bisogno per riposare?"}];
+const SB={
+Samhain:{t:"trasformazione, memoria, antenati, conclusione e rinnovamento",c:"nero, arancio, viola",s:"candela, melograno, zucca, specchio",h:"Storia: festa gaelica documentata nel folklore irlandese medievale, legata alla fine della stagione dei raccolti. Il rito Wicca moderno è una ricostruzione del Novecento.",p:{t:"Una candela per ciò che è stato",m:"una candela",d:10,s:["Accendi la candela in un luogo tranquillo.","Pensa a una persona o a una fase che si è conclusa.","Ringrazia per ciò che ti ha lasciato.","Soffia sulla candela lasciando andare ciò che non vuoi portare con te."],q:"Cosa sono pronto a lasciare andare?"}},
+Yule:{t:"rinascita, speranza, luce e introspezione",c:"rosso, verde, oro",s:"sempreverdi, candela, ceppo",h:"Storia: feste di mezzo inverno sono attestate nelle culture germaniche; il nome Yule compare nelle fonti nordiche. L’attuale cerimonia neopagana è moderna.",p:{t:"Un minuto di luce nel buio",m:"una candela o una lampada",d:10,s:["Spegni le luci della stanza.","Accendi una piccola luce.","Osserva la fiamma in silenzio.","Pensa a una speranza per l’anno che nasce."],q:"Quale luce voglio custodire quest’inverno?"}},
+Imbolc:{t:"purificazione, ispirazione, risveglio e preparazione",c:"bianco, giallo tenue",s:"candele, snowdrop, acqua, Brigid",h:"Storia: Imbolc è citata nella tradizione irlandese medievale e associata più tardi a Brigid; le pratiche attuali sono interpretazioni moderne.",p:{t:"Ordine in un solo angolo",m:"nessuno",d:15,s:["Scegli un piccolo angolo di casa.","Riordinalo con attenzione, respirando.","Apri una finestra per far entrare aria.","Chiediti cosa vuoi far germogliare."],q:"Cosa sta iniziando a risvegliarsi in me?"}},
+Ostara:{t:"equilibrio, crescita e nuovi inizi",c:"verde tenue, giallo, rosa",s:"uova, semi, fiori, lepri",h:"Storia: il nome deriva da Eostre, citata da Beda; i simboli di uova e lepre come “antichi” sono in gran parte moderni. Evita di presentarli come documentati.",p:{t:"Semina un’intenzione",m:"un seme e un vasetto",d:15,s:["Pensa a un’intenzione concreta.","Pianta il seme nella terra.","Annaffia con un gesto lento.","Prenditi cura del vaso nelle settimane successive."],q:"Che cosa voglio coltivare con costanza?"}},
+Beltane:{t:"vitalità, passione, creatività e amore",c:"verde, rosso, bianco",s:"fiori, fuoco, nastri, maggiociondolo",h:"Storia: Beltane è una festa gaelica di inizio estate attestata nelle fonti irlandesi e scozzesi. Le forme rituali moderne sono rielaborazioni.",p:{t:"Una camminata tra i fiori",m:"un luogo con verde",d:20,s:["Esci a passeggio senza fretta.","Osserva colori e profumi.","Scegli un elemento che ti emoziona.","Annota cosa ti dà vitalità."],q:"Che cosa mi fa sentire vivo?"}},
+Litha:{t:"abbondanza, luce, gratitudine e pienezza",c:"giallo, oro, azzurro",s:"sole, girasole, fuoco, erbe",h:"Storia: i solstizi sono celebrati in molte culture europee; il nome Litha è moderno, tratto da Beda.",p:{t:"Gratitudine al sole",m:"un luogo con luce",d:10,s:["Stai alla luce del giorno qualche minuto.","Elenca tre cose che ti fanno stare bene.","Ringrazia in silenzio.","Chiediti come condividere questa energia."],q:"Cosa è pieno nella mia vita?"}},
+Lughnasadh:{t:"raccolto, impegno, risultati e riconoscenza",c:"oro, arancio, marrone",s:"grano, pane, falce, frutta",h:"Storia: Lughnasadh è una festa gaelica del primo raccolto, legata al dio Lugh nelle fonti medievali.",p:{t:"I miei raccolti",m:"carta e penna",d:10,s:["Scrivi tre risultati dell’anno finora.","Riconosci l’impegno che li ha resi possibili.","Condividi un pezzo di pane o di frutta con qualcuno.","Decidi cosa vuoi ancora seminare."],q:"Quali frutti del mio lavoro merito di riconoscere?"}},
+Mabon:{t:"equilibrio, gratitudine, raccolto, riflessione",c:"rosso, arancio, bordeaux",s:"mele, uva, cornucopia, foglie",h:"Storia: l’equinozio d’autunno è celebrato in molte culture. Il nome Mabon è stato introdotto nel Novecento.",p:{t:"La bilancia delle stagioni",m:"carta e penna",d:10,s:["Disegna due colonne: luce e ombra.","Annota cosa c’è in ciascuna oggi.","Ringrazia per entrambe.","Scegli un gesto per riequilibrare."],q:"Dove cerco un nuovo equilibrio?"}}};
+const ORD=["Samhain","Yule","Imbolc","Ostara","Beltane","Litha","Lughnasadh","Mabon"];
+function sabbats(y){return[{n:"Imbolc",t:new Date(y,1,2).getTime()},{n:"Ostara",t:season(y,0,2,15)},{n:"Beltane",t:new Date(y,3,30,0,0).getTime()+864e5*0+0},{n:"Litha",t:season(y,90,5,15)},{n:"Lughnasadh",t:new Date(y,7,1).getTime()},{n:"Mabon",t:season(y,180,8,15)},{n:"Samhain",t:new Date(y,9,31).getTime()},{n:"Yule",t:season(y,270,11,15)}]}
+function sabNow(now){const a=[].concat(sabbats(now.getFullYear()-1),sabbats(now.getFullYear()),sabbats(now.getFullYear()+1)).sort((x,y)=>x.t-y.t);let i=0;while(a[i+1].t<=now.getTime())i++;return{cur:a[i],next:a[i+1],list:a}}
+const dm=(t,o)=>new Date(t).toLocaleDateString("it-IT",o||{day:"numeric",month:"long",year:"numeric"});
+const dt=t=>new Date(t).toLocaleString("it-IT",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+const pos=x=>{const s=Math.floor(x/30),dg=x%30;return`${Math.floor(dg)}°${String(Math.floor((dg%1)*60)).padStart(2,"0")}′ ${Z[s]}`};
+const ASP=[["congiunzione",0,"fusione"],["sestile",60,"opportunità"],["quadratura",90,"tensione creativa"],["trigono",120,"fluidità"],["opposizione",180,"equilibrio da cercare"]];
+function aspects(A,B,orb,same){const out=[];const ka=Object.keys(A).filter(k=>GL[k]),kb=Object.keys(B).filter(k=>GL[k]);for(const a of ka)for(const b of kb){if(same&&a>=b)continue;const d=Math.abs(wrap(A[a]-B[b]));for(const[n,g,m]of ASP){const o=Math.abs(d-g);if(o<=orb)out.push({a,b,n,m,o});}}return out.sort((x,y)=>x.o-y.o)}
+function moonSvg(e,r=36){const w=e<180,c=Math.cos(e*R),rx=Math.abs(c)*r,os=w?1:0,is=w?(c>0?0:1):(c>0?1:0);
+return`<svg width="${r*2+4}" height="${r*2+4}" viewBox="${-r-2} ${-r-2} ${r*2+4} ${r*2+4}" role="img" aria-label="Fase lunare"><circle r="${r}" fill="none" stroke="var(--line)" stroke-width="2"/><circle r="${r}" fill="var(--line)" opacity=".5"/><path d="M0 ${-r}A${r} ${r} 0 0 ${os} 0 ${r}A${rx} ${r} 0 0 ${is} 0 ${-r}Z" fill="var(--gold)"/></svg>`}
+function wheel(cur){const pts=ORD.map((n,i)=>{const a=(i*45-90)*R;return[n,150+110*Math.cos(a),150+110*Math.sin(a)]});
+return`<svg viewBox="0 0 300 300" width="100%" role="group" aria-label="Ruota dell’Anno"><circle cx="150" cy="150" r="110" fill="none" stroke="var(--line)" stroke-width="2"/><circle cx="150" cy="150" r="70" fill="none" stroke="var(--line)" stroke-dasharray="3 5"/>${pts.map(([n,x,y])=>`<g tabindex="0" role="button" aria-label="${n}" style="cursor:pointer" onclick="openSb('${n}')" onkeydown="if(event.key==='Enter')openSb('${n}')"><circle cx="${x}" cy="${y}" r="${n==cur?17:12}" fill="${n==cur?"var(--gold)":"var(--card)"}" stroke="var(--gold)" stroke-width="2"/><text x="${x}" y="${y+(y<150?-22:30)}" text-anchor="middle" font-size="12" fill="var(--tx)" font-family="Nunito Sans,sans-serif">${n}</text></g>`).join("")}<text x="150" y="156" text-anchor="middle" font-size="42" fill="var(--gold)">☉</text></svg>`}
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let tab="oggi",sel=null,now=new Date(),S;
+function natal(p){if(!p||!p.date)return null;try{const[y,m,d]=p.date.split("-").map(Number),[hh,mm]=(p.time||"12:00").split(":").map(Number),t=Date.UTC(y,m-1,d,hh,mm)-(+p.tz||0)*36e5,l=sky(t);
+const th=n360(280.46061837+360.98564736629*(jdOf(t)-2451545)+(+p.lon||0))*R,ph=(+p.lat||0)*R,ep=23.4393*R,asc=n360(Math.atan2(Math.cos(th),-(Math.sin(th)*Math.cos(ep)+Math.tan(ph)*Math.sin(ep)))/R);
+return{l,asc,t,hasLoc:p.lat!==""&&p.lon!==""}}catch(e){return null}}
+function tabs(){const T=[["oggi","Oggi"],["ruota","Ruota"],["luna","Luna"],["cielo","Cielo"],["diario","Diario"],["io","Io"]];$("#nav").innerHTML=T.map(([k,n])=>`<button aria-current="${tab==k}" onclick="go('${k}')">${n}</button>`).join("")}
+function go(k){tab=k;sel=null;draw();scrollTo(0,0)}
+function openSb(n){tab="ruota";sel=n;draw();scrollTo(0,0)}
+const tzn=Intl.DateTimeFormat().resolvedOptions().timeZone;
+function stamp(){return`<div class="src">Aggiornato: ${now.toLocaleString("it-IT",{dateStyle:"full",timeStyle:"medium"})} · fuso ${tzn}</div>`}
+function pracCard(sn,show){const p=SB[sn].p;return`<div class="card"><h3>${p.t}</h3><p class="mu">${p.d} minuti · Occorre: ${p.m}</p><ol>${p.s.map(x=>`<li>${x}</li>`).join("")}</ol><p class="q">${p.q}</p>${show?`<textarea id="pn" rows="3" placeholder="Annota le tue sensazioni"></textarea><button class="b" onclick="saveP('${sn}')">Salva nel diario</button>`:""}</div>`}
+function saveP(sn){const v=$("#pn").value.trim();if(!v)return;addEntry(`${SB[sn].p.t}: ${v}`);$("#pn").value="";alert("Salvato nel diario.")}
+function addEntry(tx){const L=store.get("anima.diary",[]),k=sky(+now),sn=sabNow(now).cur.n;L.unshift({id:+now,tx,sb:sn,ph:PH[phIdx(k._e)],sg:Z[Math.floor(k.Luna/30)]});store.set("anima.diary",L)}
+function draw(){tabs();now=new Date();const t=+now,K=sky(t),sb=sabNow(now),sn=sb.cur.n,pi=phIdx(K._e),ms=Math.floor(K.Luna/30),P=store.get("anima.profile",{}),N=natal(P),el=ZE[ms%4];
+let h="";
+if(tab=="oggi"){const days=Math.ceil((sb.next.t-t)/864e5),np=nextPhases(t),top=aspects(K,K,4,true).slice(0,3),tr=N?aspects(K,N.l,3).slice(0,4):[];
+h=`<h1 class="fade">${P.name?`Ciao, ${P.name}`:"ANIMA"}</h1><p class="q mu">Non devi controllare il ritmo della vita. Devi imparare ad ascoltarlo.</p>
+<div class="card"><h2>${sn}</h2><p class="mu">Dal ${dm(sb.cur.t,{day:"numeric",month:"long"})} · ${days} giorni a ${sb.next.n} (${dm(sb.next.t,{day:"numeric",month:"long"})})</p><p>Tema: ${SB[sn].t}.</p><button class="g" onclick="openSb('${sn}')">Apri la scheda</button></div>
+<div class="card row">${moonSvg(K._e)}<div><h3>${PH[pi]}</h3><p class="mu" style="margin:0">${Math.round(K._ill*100)}% illuminata · età ${K._age.toFixed(1)} giorni<br>Luna in ${Z[ms]} · ${Math.round(K._dist).toLocaleString("it-IT")} km</p></div></div>
+<div class="card"><h3>Lettura integrata</h3><p>Siamo in ${sn} (${SB[sn].t.split(",")[0]}), con ${PH[pi].toLowerCase()} in ${Z[ms]} (${el}: ${EL[el]}). Fase lunare: ${LP[pi].k}. ${top[0]?`Aspetto del giorno: ${top[0].a} in ${top[0].n} con ${top[0].b} (${top[0].m}), tema simbolico di ${KW[top[0].a]} e ${KW[top[0].b]}.`:""}</p><p>Pratica: <b>${SB[sn].p.t}</b>. Atteggiamento lunare: ${LP[pi].p}</p>${tr.length?`<p class="mu">Per il tuo tema: ${tr.map(x=>`${x.a} ${x.n} ${x.b} natale`).join("; ")}.</p>`:`<p class="mu">Inserisci i dati di nascita in “Io” per le letture personali.</p>`}<div class="src">Letture simboliche, non previsioni. Dati: calcolo locale con elementi orbitali a bassa precisione.</div></div>
+<h2>La pratica di oggi</h2>${pracCard(sn,true)}
+<div class="card"><h3>Prossime fasi</h3><table>${np.map(x=>`<tr><td>${x.n}</td><td>${x.t?dt(x.t):"—"}</td></tr>`).join("")}</table></div>${stamp()}`}
+if(tab=="ruota"){if(sel){const S=SB[sel];h=`<button class="g" onclick="go('ruota')">← Ruota</button><h1 style="margin-top:12px">${sel}</h1><p>${sb.list.find(x=>x.n==sel&&x.t>t-3e10).t?dm(sb.list.find(x=>x.n==sel&&x.t>t-18e9).t):""}</p><div class="card"><p>Tema: ${S.t}.</p><div class="sym"><b>Colori:</b> ${S.c}<br><b>Simboli:</b> ${S.s}</div><p>${S.h}</p><p class="mu">Distinzione: le fonti storiche sono quelle indicate sopra; ogni altra pratica è interpretazione spirituale moderna, personale e facoltativa.</p></div>${pracCard(sel,false)}`}
+else h=`<h1>La Ruota dell’Anno</h1>${wheel(sn)}<p class="mu">Tocca un Sabbat. Solstizi ed equinozi sono calcolati dal Sole; le feste a metà strada hanno date tradizionali fisse (1 nov., 2 feb., 30 apr., 1 ago.).</p><div class="card"><table>${sb.list.filter(x=>x.t>t-18e9&&x.t<t+3.2e10).map(x=>`<tr><td>${x.n}</td><td>${dt(x.t).split(",")[0]}</td></tr>`).join("")}</table></div>`}
+if(tab=="luna"){h=`<h1>La Luna</h1><div class="card row">${moonSvg(K._e,44)}<div><h3>${PH[pi]}</h3><p class="mu" style="margin:0">${Math.round(K._ill*100)}% · ${K._age.toFixed(1)} giorni · in ${Z[ms]}</p></div></div>`+LP.map((p,i)=>`<div class="card" ${i==pi?'style="border-color:var(--gold)"':""}><h3>${PH[i]}</h3><p><b>Simbolo:</b> ${p.k}.<br><b>Favorire:</b> ${p.f}.<br><b>Lasciare andare:</b> ${p.r}.</p><p>${p.p}</p><p class="q">${p.q}</p></div>`).join("")+stamp()}
+if(tab=="cielo"){const A=aspects(K,K,5,true).slice(0,8);h=`<h1>Il cielo adesso</h1><div class="card"><table>${Object.keys(GL).map(k=>`<tr><td>${GL[k]} ${k}</td><td>${pos(K[k])}${K._r[k]?" ℞":""}</td></tr>`).join("")}</table><p class="mu">℞ = moto retrogrado apparente. Sistema: zodiaco tropicale.</p></div><div class="card"><h3>Aspetti del momento</h3><table>${A.map(x=>`<tr><td>${GL[x.a]} ${x.a} ${x.n} ${GL[x.b]} ${x.b}</td><td>${x.o.toFixed(1)}°</td></tr>`).join("")||"<tr><td>Nessun aspetto stretto</td></tr>"}</table><p class="mu">Interpretazione simbolica: ogni aspetto invita a riflettere su come due aree della vita dialogano. Non è una previsione.</p></div><div class="src">Fonte: elementi orbitali di bassa precisione (Schlyter/Meeus), calcolati sul dispositivo. Plutone è approssimato (±1°). Orari di levata e tramonto lunare non ancora inclusi.</div>${stamp()}`}
+if(tab=="diario"){const L=store.get("anima.diary",[]);h=`<h1>Diario</h1><div class="card"><textarea id="dn" rows="4" placeholder="Pensieri, sogni, intenzioni…"></textarea><button class="b" onclick="const v=$('#dn').value.trim();if(v){addEntry(v);draw()}">Salva</button><p class="mu">Resta sul tuo dispositivo, in questo browser.</p></div>`+(L.length?L.map(e=>`<div class="card"><p class="mu">${dt(e.id)} · ${e.sb} · ${e.ph} in ${e.sg}</p><p>${e.tx.replace(/</g,"&lt;")}</p><button class="g" onclick="delE(${e.id})">Elimina</button></div>`).join(""):`<p class="mu">Ancora nessuna nota. Scrivi la prima.</p>`)}
+if(tab=="io"){h=`<h1>Io</h1><div class="card"><label>Nome (facoltativo)</label><input id="p1" value="${P.name||""}"><label>Data di nascita</label><input id="p2" type="date" value="${P.date||""}"><label>Ora di nascita (facoltativa)</label><input id="p3" type="time" value="${P.time||""}"><label>Latitudine e longitudine del luogo (es. 41.9, 12.5)</label><div class="row"><input id="p4" placeholder="lat" value="${P.lat||""}"><input id="p5" placeholder="lon" value="${P.lon||""}"></div><label>Fuso orario alla nascita (ore da UTC, es. 1 o 2 con ora legale)</label><input id="p6" value="${P.tz??""}"><button class="b" onclick="saveProf()">Salva</button></div>`;
+if(N){h+=`<div class="card"><h3>Tema natale</h3><p class="mu">Zodiaco tropicale, case segno intero.</p><table><tr><td>Sole</td><td>${pos(N.l.Sole)}</td></tr><tr><td>Luna</td><td>${pos(N.l.Luna)}</td></tr>${P.time&&N.hasLoc?`<tr><td>Ascendente</td><td>${pos(N.asc)}</td></tr>`:""}</table>${P.time&&N.hasLoc?`<p class="mu">Case: ${Object.keys(GL).map(k=>`${GL[k]}${Math.floor(n360(N.l[k]-Math.floor(N.asc/30)*30)/30)+1}`).join(" ")}</p>`:`<p class="mu">Ora e coordinate servono per Ascendente e case.</p>`}</div>`}
+h+=`<div class="card"><h3>Calendario</h3><p class="mu">Scarica un file con i Sabbat e le fasi lunari dei prossimi 12 mesi. Aprendolo su iPhone, scegli “Aggiungi tutto” e poi il calendario “ANIMA — Ruota dell’Anno”.</p><button class="b" onclick="exportICS()">Scarica calendario (.ics)</button></div><div class="card"><h3>Promemoria</h3><p class="mu">Ti avviso con delicatezza quando apri l’app e un Sabbat o una Luna nuova/piena è vicino. Non invio notifiche ad app chiusa.</p><button class="b" onclick="askNotif()">Attiva promemoria</button></div>`}
+$("#app").innerHTML=h}
+function saveProf(){store.set("anima.profile",{name:$("#p1").value,date:$("#p2").value,time:$("#p3").value,lat:$("#p4").value,lon:$("#p5").value,tz:$("#p6").value});draw()}
+function delE(id){store.set("anima.diary",store.get("anima.diary",[]).filter(e=>e.id!=id));draw()}
+
+function pad(n){return String(n).padStart(2,"0")}
+const icsU=t=>{const d=new Date(t);return d.getUTCFullYear()+pad(d.getUTCMonth()+1)+pad(d.getUTCDate())+"T"+pad(d.getUTCHours())+pad(d.getUTCMinutes())+"00Z"};
+function exportICS(){const t0=Date.now(),ev=[];const sb=sabNow(new Date(t0)).list.filter(x=>x.t>=t0-864e5&&x.t<t0+366*864e5);
+sb.forEach(x=>{const d=new Date(x.t),ds=d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate()),e=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1);ev.push(["sab-"+x.n+ds,"DTSTART;VALUE=DATE:"+ds+"\r\nDTEND;VALUE=DATE:"+e.getFullYear()+pad(e.getMonth()+1)+pad(e.getDate()),"ANIMA · "+x.n,SB[x.n].t])});
+let t=t0;for(let i=0;i<14;i++){const p=nextPhases(t);p.forEach(x=>{if(x.t&&x.t<t0+366*864e5)ev.push(["moon"+x.n+icsU(x.t),"DTSTART:"+icsU(x.t)+"\r\nDTEND:"+icsU(x.t+36e5),"ANIMA · "+x.n,"Fase lunare calcolata da ANIMA"])});t=Math.max(...p.map(x=>x.t||0))+36e5}
+const stamp=icsU(t0),L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//ANIMA//IT","CALSCALE:GREGORIAN","X-WR-CALNAME:ANIMA — Ruota dell’Anno"];
+ev.forEach(e=>L.push("BEGIN:VEVENT","UID:"+e[0]+"@anima","DTSTAMP:"+stamp,e[1],"SUMMARY:"+e[2],"DESCRIPTION:"+e[3],"END:VEVENT"));L.push("END:VCALENDAR");
+const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([L.join("\r\n")],{type:"text/calendar"}));a.download="anima-ruota-dellanno.ics";document.body.appendChild(a);a.click();a.remove()}
+async function notify(m){try{const r=await navigator.serviceWorker.ready;r.showNotification("ANIMA",{body:m,icon:"icon-192.png",tag:m})}catch(e){}}
+async function askNotif(){if(!("Notification" in window))return alert("Questo browser non supporta le notifiche.");const r=await Notification.requestPermission();store.set("anima.notif",r=="granted");alert(r=="granted"?"Promemoria attivi quando apri l’app.":"Permesso non concesso. Puoi cambiarlo nelle impostazioni del dispositivo.")}
+function gentle(){if(!store.get("anima.notif",false)||Notification.permission!="granted")return;const n=new Date(),b=sabNow(n),dd=Math.ceil((b.next.t-+n)/864e5),k=store.get("anima.last","");const key=b.next.n+n.toDateString();if(k==key)return;
+if(dd<=7){notify(`Sta arrivando ${b.next.n}. ${SB[b.next.n].t.split(",")[0]}: un momento per fermarti e ascoltare.`);store.set("anima.last",key)}else{const e=sky(+n)._e;if(e<12||e>348||Math.abs(e-180)<12){notify(e<180&&e>90||e>180&&e<270?"":(Math.abs(e-180)<12?"Luna piena: tempo di gratitudine.":"Luna nuova: tempo di intenzioni."));store.set("anima.last",key)}}}
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").then(()=>gentle()).catch(()=>{});
+draw();setInterval(()=>{if(["oggi","luna","cielo"].includes(tab)&&!document.activeElement.matches("textarea,input"))draw()},60000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!document.activeElement.matches("textarea,input"))draw()});
+</script></body></html>
